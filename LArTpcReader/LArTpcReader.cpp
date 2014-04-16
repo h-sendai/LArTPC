@@ -154,7 +154,6 @@ int LArTpcReader::daq_start()
         std::cerr << "Sock Fatal Error : Unknown" << std::endl;
         fatal_error_report(USER_DEFINED_ERROR1, "SOCKET FATAL ERROR");
     }
-    //m_sock->setOptRecvTimeOut(60.0);
 
     // Check data port connections
     bool outport_conn = check_dataPort_connections( m_OutPort );
@@ -215,8 +214,8 @@ int LArTpcReader::read_data_from_detectors()
         fatal_error_report(USER_DEFINED_ERROR1, "SOCKET FATAL ERROR");
     }
     else if (status == DAQMW::Sock::ERROR_TIMEOUT) {
-        std::cerr << "### Timeout: m_sock->readAll" << std::endl;
-        fatal_error_report(USER_DEFINED_ERROR2, "SOCKET TIMEOUT (HEADER PART)");
+        fprintfwt(stderr, "Header Read Timeout\n");
+        return DAQMW::Sock::ERROR_TIMEOUT;
     }
     // get data part length
     data_length = get_data_length(&m_data[0], HEADER_SIZE);
@@ -291,6 +290,10 @@ int LArTpcReader::daq_run()
         if (ret > 0) {
             m_recv_byte_size = ret;
             set_data(m_recv_byte_size); // set data to OutPort Buffer
+        }
+        else if (ret == DAQMW::Sock::ERROR_TIMEOUT) {
+            // header read timed out.  Retry next daq_run().
+            return 0;
         }
     }
 

@@ -11,6 +11,7 @@
 #define LARTPCREADER_H
 
 #include "DaqComponentBase.h"
+#include "logUtil.h"
 
 #include <daqmw/Sock.h>
 

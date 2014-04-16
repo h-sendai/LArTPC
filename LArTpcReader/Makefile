@@ -4,6 +4,7 @@ all: $(COMP_NAME)Comp
 
 SRCS += $(COMP_NAME).cpp
 SRCS += $(COMP_NAME)Comp.cpp
+SRCS += logUtil.cpp
 
 # Socket library
 LDLIBS += -L$(DAQMW_LIB_DIR) -lSock
