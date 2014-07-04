@@ -46,6 +46,7 @@
                        <param pid="dirName">/tmp</param>
                        <param pid="isLogging">yes</param>
                        <param pid="maxFileSizeInMegaByte">1024</param>
+                       <param pid="appendTimestamp">YES</param>
                     </params>
                 </component>
             </components>

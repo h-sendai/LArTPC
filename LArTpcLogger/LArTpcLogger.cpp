@@ -42,6 +42,7 @@ LArTpcLogger::LArTpcLogger(RTC::Manager* manager)
       m_filesOpened(false),
       m_in_status(BUF_SUCCESS),
       m_update_rate(100),
+      m_append_timestamp(false),
       m_debug(false)
 {
     // Registration: InPort/OutPort/Service
@@ -130,6 +131,12 @@ int LArTpcLogger::parse_params(::NVList* list)
             m_update_rate = atoi(svalue.c_str());
             if (m_debug) {
                 std::cerr << "update rate:" << m_update_rate << std::endl;
+            }
+        }
+        
+        if (sname == "appendTimestamp") {
+            if (svalue == "YES" || svalue == "Yes" || svalue == "yes") {
+                m_append_timestamp = true;
             }
         }
     }
@@ -308,12 +315,25 @@ int LArTpcLogger::daq_run()
     }
 
     if (m_isDataLogging) {
-        int ret = fileUtils->write_data((char *)&m_in_data.data[HEADER_BYTE_SIZE],
-                                        event_byte_size);
+        int ret;
 
+        ret = fileUtils->write_data((char *)&m_in_data.data[HEADER_BYTE_SIZE],
+                                        event_byte_size);
         if (ret < 0) {
             std::cerr << "### LArTpcLogger: ERROR occured at data saving\n";
             fatal_error_report(CANNOT_WRITE_DATA);
+        }
+
+        if (m_append_timestamp) {
+            struct timeval tv;
+            int sec;
+            gettimeofday(&tv, NULL);
+            sec = (int) tv.tv_sec;
+            ret = fileUtils->write_data((char *)&sec, sizeof(int));
+            if (ret < 0) {
+                std::cerr << "### LArTpcLogger: ERROR occured at data saving\n";
+                fatal_error_report(CANNOT_WRITE_DATA);
+            }
         }
     }
 

@@ -60,6 +60,7 @@ private:
     unsigned int m_maxFileSizeInMByte;
     BufferStatus m_in_status;
     int m_update_rate;
+    bool m_append_timestamp;
     bool m_debug;
 };
 
